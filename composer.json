@@ -1,0 +1,24 @@
+{
+  "name": "Trident/Stream",
+  "description": "Provides a simple abstraction over streams of data",
+  "minimum-stability": "stable",
+  "keywords": ["stream", "trident","psr-7"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ruslan Perederko",
+      "email": "peruongithub@gmail.com",
+      "homepage": "https://github.com/peruongithub"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0",
+    "psr/http-message": "1.0.x-dev"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": { "Trident\\Component\\Stream\\": "src/" }
+  }
+}
