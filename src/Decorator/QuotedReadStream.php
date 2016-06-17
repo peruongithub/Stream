@@ -10,25 +10,18 @@
 
 namespace Trident\Component\Stream\Decorator;
 
-use Psr\Http\Message\StreamInterface;
-use Trident\Component\Stream\Interfaces\MetadataStreamInterface;
 use Trident\Component\Stream\Interfaces\ReadableStreamInterface;
-use Trident\Component\Stream\Interfaces\WritableStreamInterface;
-use Trident\Component\Stream\Traits\MetadataStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\ReadableStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\SeekableStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\WritableStreamDecoratorTrait;
 
 
-class QuotedReadStream implements StreamInterface, ReadableStreamInterface, WritableStreamInterface, MetadataStreamInterface
+class QuotedReadStream extends DecoratedStream
 {
-    use MetadataStreamDecoratorTrait;
-    use SeekableStreamDecoratorTrait;
-    use ReadableStreamDecoratorTrait;
-    use WritableStreamDecoratorTrait;
+    protected $maxBytesToRead;
+    protected $bytesRead = 0;
 
-    private $maxBytesToRead;
-    private $bytesRead = 0;
+    /**
+     * @var ReadableStreamInterface $stream
+     */
+    protected $stream;
 
     /**
      * @param ReadableStreamInterface $stream
@@ -36,7 +29,7 @@ class QuotedReadStream implements StreamInterface, ReadableStreamInterface, Writ
      */
     public function __construct(ReadableStreamInterface $stream, $maxBytesToRead)
     {
-        $this->stream = $stream;
+        parent::__construct($stream);
         $this->maxBytesToRead = abs((int)$maxBytesToRead);
     }
 
@@ -44,21 +37,13 @@ class QuotedReadStream implements StreamInterface, ReadableStreamInterface, Writ
     {
         $this->maxBytesToRead = 0;
 
-        return $this->stream->detach();
-    }
-
-    /**
-     * Closes the resource when the destructed
-     */
-    public function __destruct()
-    {
-        $this->close();
+        return parent::detach();
     }
 
     public function close()
     {
         $this->maxBytesToRead = 0;
-        $this->stream->close();
+        parent::close();
     }
 
     /**
@@ -77,6 +62,13 @@ class QuotedReadStream implements StreamInterface, ReadableStreamInterface, Writ
      */
     public function getSize()
     {
+        if(!$this->isValidReadableStream()){
+            return null;
+        }
+        $realSize = $this->stream->getSize();
+        if(null !== $realSize && $this->maxBytesToRead > $realSize){
+            return $realSize;
+        }
         return $this->maxBytesToRead;
     }
 

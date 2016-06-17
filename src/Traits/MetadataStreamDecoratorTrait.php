@@ -108,6 +108,13 @@ trait MetadataStreamDecoratorTrait
      */
     public function getMetadata($key = null)
     {
-        $this->stream->getMetadata($key);
+        if(
+            $this->stream instanceof MetadataStreamInterface ||
+            $this->stream instanceof StreamInterface
+        ){
+            return $this->stream->getMetadata($key);
+        }
+
+        return !$key?null:[];
     }
 }

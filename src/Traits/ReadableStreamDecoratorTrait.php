@@ -10,8 +10,8 @@
 
 namespace Trident\Component\Stream\Traits;
 
+use Psr\Http\Message\StreamInterface;
 use Trident\Component\Stream\Interfaces\ReadableStreamInterface;
-use Trident\Component\Stream\Utils;
 
 
 trait ReadableStreamDecoratorTrait
@@ -26,10 +26,21 @@ trait ReadableStreamDecoratorTrait
      */
     public function __toString()
     {
-        if (!$this->isReadable()) {
-            return '';
+        $string = '';
+        try {
+            if (!$this->isReadable()) {
+                return '';
+            }
+
+            if ($this->isSeekable()) {
+                $this->seek(0);
+            }
+
+            $string = $this->getContents();
+        } catch (\Exception $e) {
+
         }
-        return Utils::copyToString($this->stream);
+        return $string;
     }
 
     /**
@@ -37,7 +48,7 @@ trait ReadableStreamDecoratorTrait
      */
     public function getSize()
     {
-        return $this->stream->getSize();
+        return $this->isValidReadableStream()?$this->stream->getSize():null;
     }
 
     /**
@@ -45,7 +56,7 @@ trait ReadableStreamDecoratorTrait
      */
     public function eof()
     {
-        return $this->stream->eof();
+        return $this->isValidReadableStream()?$this->stream->eof():true;
     }
 
     /**
@@ -55,7 +66,8 @@ trait ReadableStreamDecoratorTrait
      */
     public function isReadable()
     {
-        return $this->stream->isReadable();
+        return $this->isValidReadableStream()?
+            $this->stream->isReadable():false;
     }
 
     /**
@@ -66,6 +78,7 @@ trait ReadableStreamDecoratorTrait
         if (!$this->isReadable()) {
             throw new \RuntimeException('Cannot read from non-readable stream');
         }
+
         return $this->stream->read($length);
     }
 
@@ -77,6 +90,15 @@ trait ReadableStreamDecoratorTrait
         if (!$this->isReadable()) {
             throw new \RuntimeException('Cannot read from non-readable stream');
         }
-        return Utils::copyToString($this->stream);
+        $contents = '';
+        while (!$this->eof()) {
+            $contents .= $this->read(1024);
+        }
+
+        return $contents;
+    }
+
+    protected function isValidReadableStream(){
+        return ($this->stream instanceof ReadableStreamInterface || $this->stream instanceof StreamInterface);
     }
 }

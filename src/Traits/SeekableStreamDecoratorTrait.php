@@ -10,6 +10,7 @@
 
 namespace Trident\Component\Stream\Traits;
 
+use Psr\Http\Message\StreamInterface;
 use Trident\Component\Stream\Interfaces\SeekableStreamInterface;
 
 
@@ -25,7 +26,10 @@ trait SeekableStreamDecoratorTrait
      */
     public function isSeekable()
     {
-        return $this->stream->isSeekable();
+        if($this->stream instanceof SeekableStreamInterface || $this->stream instanceof StreamInterface){
+            return $this->stream->isSeekable();
+        }
+        return false;
     }
 
     /**
@@ -55,6 +59,10 @@ trait SeekableStreamDecoratorTrait
      */
     public function tell()
     {
-        return $this->stream->tell();
+        if($this->stream instanceof SeekableStreamInterface || $this->stream instanceof StreamInterface){
+            return $this->stream->tell();
+        }
+
+        return 0;
     }
 }

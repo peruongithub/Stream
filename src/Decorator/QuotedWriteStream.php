@@ -10,24 +10,13 @@
 
 namespace Trident\Component\Stream\Decorator;
 
-use Psr\Http\Message\StreamInterface;
-use Trident\Component\Stream\Interfaces\MetadataStreamInterface;
-use Trident\Component\Stream\Interfaces\ReadableStreamInterface;
 use Trident\Component\Stream\Interfaces\WritableStreamInterface;
-use Trident\Component\Stream\Traits\MetadataStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\ReadableStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\SeekableStreamDecoratorTrait;
-use Trident\Component\Stream\Traits\WritableStreamDecoratorTrait;
 
 
-class QuotedWriteStream implements StreamInterface, ReadableStreamInterface, WritableStreamInterface, MetadataStreamInterface
+class QuotedWriteStream extends DecoratedStream
 {
-    use MetadataStreamDecoratorTrait;
-    use SeekableStreamDecoratorTrait;
-    use ReadableStreamDecoratorTrait;
-    use WritableStreamDecoratorTrait;
-
     private $maxBytesToWrite;
+    
     private $bytesWritten = 0;
 
     /**
@@ -44,21 +33,13 @@ class QuotedWriteStream implements StreamInterface, ReadableStreamInterface, Wri
     {
         $this->maxBytesToWrite = 0;
 
-        return $this->stream->detach();
-    }
-
-    /**
-     * Closes the resource when the destructed
-     */
-    public function __destruct()
-    {
-        $this->close();
+        return parent::detach();
     }
 
     public function close()
     {
         $this->maxBytesToWrite = 0;
-        $this->stream->close();
+        parent::close();
     }
 
     public function write($string)

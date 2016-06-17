@@ -10,6 +10,7 @@
 
 namespace Trident\Component\Stream\Traits;
 
+use Psr\Http\Message\StreamInterface;
 use Trident\Component\Stream\Interfaces\ReadableStreamInterface;
 use Trident\Component\Stream\Interfaces\WritableStreamInterface;
 
@@ -23,7 +24,10 @@ trait WritableStreamDecoratorTrait
 
     public function isWritable()
     {
-        return $this->stream->isWritable();
+        if($this->stream instanceof WritableStreamInterface || $this->stream instanceof StreamInterface){
+            return $this->stream->isWritable();
+        }
+        return false;
     }
 
     public function writeStream(ReadableStreamInterface $stream)
