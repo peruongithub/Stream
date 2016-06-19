@@ -26,21 +26,14 @@ trait ReadableStreamDecoratorTrait
      */
     public function __toString()
     {
-        $string = '';
-        try {
-            if (!$this->isReadable()) {
-                return '';
-            }
-
-            if ($this->isSeekable()) {
-                $this->seek(0);
-            }
-
-            $string = $this->getContents();
-        } catch (\Exception $e) {
-
+        if (!$this->isReadable()) {
+            return '';
         }
-        return $string;
+
+        if ($this->isSeekable()) {
+            $this->seek(0);
+        }
+        return $this->getContents();
     }
 
     /**
