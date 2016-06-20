@@ -57,17 +57,13 @@ class Stream implements ReadableStreamInterface,
 
     public function __toString()
     {
-        if (!$this->resource) {
+        if (!is_resource($this->resource) || !$this->isReadable()) {
             return '';
         }
-
-        try {
-            $this->seek(0);
-
-            return (string)stream_get_contents($this->resource);
-        } catch (\Exception $e) {
-            return '';
+        if (!$this->isSeekable()) {
+            $this->rewind();
         }
+        return (string)stream_get_contents($this->resource);
     }
 
     public function seek($offset, $whence = SEEK_SET)
