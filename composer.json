@@ -1,5 +1,5 @@
 {
-  "name": "Trident/Stream",
+  "name": "trident/stream",
   "description": "Provides a simple abstraction over streams of data",
   "minimum-stability": "stable",
   "keywords": ["stream", "trident","psr-7"],
@@ -17,6 +17,9 @@
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0"
+  },
+  "provide": {
+    "psr/http-message-implementation": "1.0"
   },
   "autoload": {
     "psr-4": { "Trident\\Component\\Stream\\": "src/" }
